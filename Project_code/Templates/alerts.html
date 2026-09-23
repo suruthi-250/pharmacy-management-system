@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}Alerts — PharmaCare{% endblock %}
+{% block page_title %}Alerts{% endblock %}
+
+{% block content %}
+
+<div class="card">
+  <div class="card-title">🔔 Active Alerts ({{ alerts|length }})</div>
+
+  {% if alerts %}
+    {% for alert in alerts %}
+      <div class="flash {{ alert.type }}" style="margin-bottom:10px;">
+        <span style="font-size:18px;">{{ alert.icon }}</span>
+        <div>
+          <div style="font-weight:600;">{{ alert.message }}</div>
+          <a href="{{ url_for('edit_medicine', med_id=alert.med_id) }}"
+             style="font-size:12px; color:inherit; opacity:0.7;">View Medicine →</a>
+        </div>
+      </div>
+    {% endfor %}
+  {% else %}
+    <div style="text-align:center; padding:48px; color:var(--muted);">
+      <div style="font-size:48px; margin-bottom:16px;">✅</div>
+      <div style="font-family:var(--font-heading); font-size:18px; font-weight:700;">All Clear!</div>
+      <div style="font-size:14px; margin-top:8px;">No alerts right now. Everything looks good.</div>
+    </div>
+  {% endif %}
+
+</div>
+
+{% endblock %}

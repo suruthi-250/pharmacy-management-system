@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block title %}Dashboard — PharmaCare{% endblock %}
+{% block page_title %}Dashboard{% endblock %}
+
+{% block content %}
+
+<!-- KPI Cards -->
+<div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:20px; margin-bottom:32px;">
+  
+  <div class="card" style="margin-bottom:0; text-align:center;">
+    <div style="font-size:32px; margin-bottom:8px;">💊</div>
+    <div style="font-family:var(--font-heading); font-size:32px; font-weight:800; color:var(--navy);">{{ total }}</div>
+    <div style="font-size:13px; color:var(--muted); margin-top:4px;">Total Medicines</div>
+  </div>
+
+  <div class="card" style="margin-bottom:0; text-align:center;">
+    <div style="font-size:32px; margin-bottom:8px;">📦</div>
+    <div style="font-family:var(--font-heading); font-size:32px; font-weight:800; color:var(--warning);">{{ low_stock }}</div>
+    <div style="font-size:13px; color:var(--muted); margin-top:4px;">Low Stock</div>
+  </div>
+
+  <div class="card" style="margin-bottom:0; text-align:center;">
+    <div style="font-size:32px; margin-bottom:8px;">💀</div>
+    <div style="font-family:var(--font-heading); font-size:32px; font-weight:800; color:var(--danger);">{{ expired }}</div>
+    <div style="font-size:13px; color:var(--muted); margin-top:4px;">Expired</div>
+  </div>
+
+  <div class="card" style="margin-bottom:0; text-align:center;">
+    <div style="font-size:32px; margin-bottom:8px;">⚠️</div>
+    <div style="font-family:var(--font-heading); font-size:32px; font-weight:800; color:var(--gold);">{{ expiring_soon }}</div>
+    <div style="font-size:13px; color:var(--muted); margin-top:4px;">Expiring Soon</div>
+  </div>
+
+</div>
+
+<!-- Alerts Panel -->
+<div class="card">
+  <div class="card-title">🔔 Active Alerts</div>
+
+  {% if alerts %}
+    {% for alert in alerts %}
+      <div class="flash {{ alert.type }}" style="margin-bottom:8px;">
+        {{ alert.icon }} {{ alert.message }}
+      </div>
+    {% endfor %}
+  {% else %}
+    <p style="color:var(--muted); font-size:14px;">✅ No alerts right now. Everything looks good!</p>
+  {% endif %}
+
+</div>
+
+<!-- Quick Actions -->
+<div class="card">
+  <div class="card-title">⚡ Quick Actions</div>
+  <div style="display:flex; gap:12px; flex-wrap:wrap;">
+    <a href="{{ url_for('add_medicine') }}" class="btn btn-primary">➕ Add Medicine</a>
+    <a href="{{ url_for('medicines') }}"    class="btn btn-ghost">💊 View Medicines</a>
+    <a href="{{ url_for('sales') }}"        class="btn btn-ghost">🛒 New Sale</a>
+    <a href="{{ url_for('alerts') }}"       class="btn btn-ghost">🔔 View Alerts</a>
+  </div>
+</div>
+
+{% endblock %}

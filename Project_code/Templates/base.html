@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}PharmaCare{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&family=Open+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --navy:    #1A2E4A;
+      --teal:    #0E7C7B;
+      --gold:    #C9963D;
+      --surface: #F5F7FA;
+      --text:    #1E293B;
+      --muted:   #475569;
+      --danger:  #DC2626;
+      --success: #16A34A;
+      --warning: #D97706;
+      --font-heading: 'Montserrat', sans-serif;
+      --font-body:    'Open Sans', sans-serif;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: var(--font-body);
+      background: var(--surface);
+      color: var(--text);
+      display: flex;
+      min-height: 100vh;
+    }
+
+    /* ── Sidebar ── */
+    .sidebar {
+      width: 220px;
+      background: var(--navy);
+      display: flex;
+      flex-direction: column;
+      position: fixed;
+      top: 0; left: 0; bottom: 0;
+      z-index: 100;
+    }
+
+    .sidebar-logo {
+      padding: 24px 20px;
+      font-family: var(--font-heading);
+      font-size: 20px;
+      font-weight: 800;
+      color: #fff;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .sidebar-logo span { color: var(--teal); }
+
+    .sidebar-nav {
+      padding: 16px 0;
+      flex: 1;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 20px;
+      color: rgba(255,255,255,0.6);
+      text-decoration: none;
+      font-family: var(--font-heading);
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.03em;
+      transition: all 0.2s;
+    }
+
+    .nav-item:hover { 
+      background: rgba(255,255,255,0.06); 
+      color: #fff; 
+    }
+
+    .nav-item.active { 
+      background: rgba(14,124,123,0.2); 
+      color: #fff;
+      border-right: 3px solid var(--teal);
+    }
+
+    .nav-icon { font-size: 16px; }
+
+    .nav-badge {
+      margin-left: auto;
+      background: var(--danger);
+      color: #fff;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 10px;
+      min-width: 20px;
+      text-align: center;
+    }
+
+    .sidebar-user {
+      padding: 16px 20px;
+      border-top: 1px solid rgba(255,255,255,0.08);
+      font-size: 12px;
+      color: rgba(255,255,255,0.5);
+    }
+
+    .sidebar-user strong {
+      display: block;
+      color: #fff;
+      font-family: var(--font-heading);
+      font-size: 13px;
+      margin-bottom: 4px;
+    }
+
+    .logout-btn {
+      display: block;
+      margin-top: 10px;
+      padding: 8px 14px;
+      background: rgba(220,38,38,0.15);
+      color: #FCA5A5;
+      border-radius: 8px;
+      text-decoration: none;
+      font-size: 12px;
+      font-family: var(--font-heading);
+      font-weight: 600;
+      text-align: center;
+      transition: background 0.2s;
+    }
+
+    .logout-btn:hover { background: rgba(220,38,38,0.3); }
+
+    /* ── Main Content ── */
+    .main {
+      margin-left: 220px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .topbar {
+      background: #fff;
+      padding: 16px 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid #E2E8F0;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+
+    .topbar-title {
+      font-family: var(--font-heading);
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--navy);
+    }
+
+    .topbar-user {
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .topbar-user span {
+      font-weight: 600;
+      color: var(--teal);
+    }
+
+    .content {
+      padding: 32px;
+      flex: 1;
+    }
+
+    /* ── Flash Messages ── */
+    .flash-messages { margin-bottom: 24px; }
+
+    .flash {
+      padding: 12px 18px;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 500;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .flash.success { background: #F0FDF4; color: #15803D; border: 1px solid #BBF7D0; }
+    .flash.danger  { background: #FEF2F2; color: #DC2626; border: 1px solid #FECACA; }
+    .flash.warning { background: #FFFBEB; color: #D97706; border: 1px solid #FDE68A; }
+    .flash.info    { background: #EFF6FF; color: #2563EB; border: 1px solid #BFDBFE; }
+
+    /* ── Cards ── */
+    .card {
+      background: #fff;
+      border-radius: 16px;
+      border: 1px solid #E2E8F0;
+      padding: 24px;
+      margin-bottom: 24px;
+    }
+
+    .card-title {
+      font-family: var(--font-heading);
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--navy);
+      margin-bottom: 20px;
+    }
+
+    /* ── Buttons ── */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 10px 20px;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      font-family: var(--font-heading);
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.03em;
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+
+    .btn-primary { background: var(--teal);    color: #fff; }
+    .btn-danger  { background: var(--danger);  color: #fff; }
+    .btn-warning { background: var(--warning); color: #fff; }
+    .btn-ghost   { background: #F1F5F9; color: var(--text); }
+    .btn:hover   { opacity: 0.88; transform: translateY(-1px); }
+
+    /* ── Tables ── */
+    .table-wrap { overflow-x: auto; }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+
+    th {
+      font-family: var(--font-heading);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      color: var(--muted);
+      padding: 12px 16px;
+      border-bottom: 2px solid #E2E8F0;
+      text-align: left;
+    }
+
+    td {
+      padding: 14px 16px;
+      border-bottom: 1px solid #F1F5F9;
+      color: var(--text);
+    }
+
+    tr:hover td { background: #F8FAFC; }
+
+    /* ── Badges ── */
+    .badge {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-family: var(--font-heading);
+      font-weight: 700;
+    }
+
+    .badge-green  { background: #F0FDF4; color: #15803D; }
+    .badge-blue   { background: #EFF6FF; color: #2563EB; }
+    .badge-purple { background: #F5F3FF; color: #7C3AED; }
+    .badge-red    { background: #FEF2F2; color: #DC2626; }
+    .badge-amber  { background: #FFFBEB; color: #D97706; }
+
+    /* ── Forms ── */
+    .form-group { margin-bottom: 20px; }
+
+    label {
+      display: block;
+      font-family: var(--font-heading);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      padding: 10px 14px;
+      border: 1.5px solid #E2E8F0;
+      border-radius: 8px;
+      font-family: var(--font-body);
+      font-size: 14px;
+      color: var(--text);
+      background: #fff;
+      transition: border-color 0.2s;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: var(--teal);
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 768px) {
+      .sidebar { display: none; }
+      .main { margin-left: 0; }
+      .content { padding: 20px; }
+    }
+  </style>
+</head>
+<body>
+
+{% if 'user_id' in session %}
+<!-- Sidebar — only shows when logged in -->
+<aside class="sidebar">
+  <div class="sidebar-logo">Pharma<span>Care</span></div>
+
+  <nav class="sidebar-nav">
+    <a href="{{ url_for('dashboard') }}"    class="nav-item {% if request.endpoint == 'dashboard' %}active{% endif %}">
+      <span class="nav-icon">📊</span> Dashboard
+    </a>
+    <a href="{{ url_for('medicines') }}"    class="nav-item {% if request.endpoint == 'medicines' %}active{% endif %}">
+      <span class="nav-icon">💊</span> Medicines
+    </a>
+    <a href="{{ url_for('sales') }}"        class="nav-item {% if request.endpoint == 'sales' %}active{% endif %}">
+      <span class="nav-icon">🛒</span> Sales
+    </a>
+    <a href="{{ url_for('alerts') }}"       class="nav-item {% if request.endpoint == 'alerts' %}active{% endif %}">
+      <span class="nav-icon">🔔</span> Alerts
+      <span class="nav-badge" id="alert-count">0</span>
+    </a>
+    {% if session.role == 'admin' %}
+    <a href="{{ url_for('audit') }}"        class="nav-item {% if request.endpoint == 'audit' %}active{% endif %}">
+      <span class="nav-icon">📋</span> Audit Log
+    </a>
+    <a href="{{ url_for('users') }}"        class="nav-item {% if request.endpoint == 'users' %}active{% endif %}">
+      <span class="nav-icon">👥</span> Users
+    </a>
+    {% endif %}
+  </nav>
+
+  <div class="sidebar-user">
+    <strong>{{ session.username }}</strong>
+    {{ session.role | capitalize }}
+    <a href="{{ url_for('logout') }}" class="logout-btn">🚪 Logout</a>
+  </div>
+</aside>
+{% endif %}
+
+<!-- Main Content -->
+<div class="main">
+
+  {% if 'user_id' in session %}
+  <div class="topbar">
+    <div class="topbar-title">{% block page_title %}PharmaCare{% endblock %}</div>
+    <div class="topbar-user">Logged in as <span>{{ session.username }}</span></div>
+  </div>
+  {% endif %}
+
+  <div class="content">
+
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="flash-messages">
+          {% for category, message in messages %}
+            <div class="flash {{ category }}">{{ message }}</div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    <!-- Page Content Goes Here -->
+    {% block content %}{% endblock %}
+
+  </div>
+</div>
+
+<!-- Live Alert Badge Update -->
+<script>
+  function updateAlertBadge() {
+    fetch('/api/alerts')
+      .then(r => r.json())
+      .then(data => {
+        const badge = document.getElementById('alert-count');
+        if (badge) badge.textContent = data.length;
+      })
+      .catch(() => {});
+  }
+  updateAlertBadge();
+  setInterval(updateAlertBadge, 30000);
+</script>
+
+</body>
+</html>

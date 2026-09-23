@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% block title %}{% if editing %}Edit{% else %}Add{% endif %} Medicine — PharmaCare{% endblock %}
+{% block page_title %}{% if editing %}Edit Medicine{% else %}Add Medicine{% endif %}{% endblock %}
+
+{% block content %}
+<div style="max-width:600px;">
+  <a href="{{ url_for('medicines') }}" class="btn btn-ghost" style="margin-bottom:24px;">← Back</a>
+
+  <div class="card">
+    <form method="POST">
+
+      <div class="form-group">
+        <label>Medicine Name</label>
+        <input type="text" name="name" placeholder="e.g. Paracetamol 500mg" required
+               value="{{ medicine.name if medicine else '' }}">
+      </div>
+
+      <div class="form-group">
+        <label>Type</label>
+        <select name="type" required>
+          <option value="">Select type...</option>
+          {% for t in ['Generic','Prescription','Herbal','Controlled'] %}
+            <option value="{{ t }}" {% if medicine and medicine.type == t %}selected{% endif %}>{{ t }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+        <div class="form-group">
+          <label>Quantity</label>
+          <input type="number" name="quantity" min="0" required
+                 value="{{ medicine.quantity if medicine else '' }}">
+        </div>
+        <div class="form-group">
+          <label>Price (₹)</label>
+          <input type="number" name="price" step="0.01" min="0" required
+                 value="{{ medicine.price if medicine else '' }}">
+        </div>
+      </div>
+
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+        <div class="form-group">
+          <label>Expiry Date</label>
+          <input type="date" name="expiry_date" required
+                 value="{{ medicine.expiry_date if medicine else '' }}">
+        </div>
+        <div class="form-group">
+          <label>Supplier</label>
+          <input type="text" name="supplier" placeholder="e.g. MedSupply Co."
+                 value="{{ medicine.supplier if medicine else '' }}">
+        </div>
+      </div>
+
+      <div style="display:flex; gap:12px; margin-top:8px;">
+        <button type="submit" class="btn btn-primary">
+          {% if editing %}💾 Save Changes{% else %}➕ Add Medicine{% endif %}
+        </button>
+        <a href="{{ url_for('medicines') }}" class="btn btn-ghost">Cancel</a>
+      </div>
+
+    </form>
+  </div>
+</div>
+{% endblock %}

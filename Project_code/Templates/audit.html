@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block title %}Audit Log — PharmaCare{% endblock %}
+{% block page_title %}Audit Log{% endblock %}
+
+{% block content %}
+
+<div class="card">
+  <div class="card-title">📋 Audit Log</div>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Action</th>
+          <th>Done By</th>
+          <th>Details</th>
+          <th>Timestamp</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for log in logs %}
+        <tr>
+          <td>
+            {% if log.action == 'ADD' %}
+              <span class="badge badge-green">➕ ADD</span>
+            {% elif log.action == 'EDIT' %}
+              <span class="badge badge-blue">✏️ EDIT</span>
+            {% elif log.action == 'DELETE' %}
+              <span class="badge badge-red">🗑️ DELETE</span>
+            {% elif log.action == 'SALE' %}
+              <span class="badge badge-purple">🛒 SALE</span>
+            {% elif log.action == 'ADD USER' %}
+              <span class="badge badge-green">👤 ADD USER</span>
+            {% elif log.action == 'DELETE USER' %}
+              <span class="badge badge-red">👤 DELETE USER</span>
+            {% else %}
+              <span class="badge badge-amber">{{ log.action }}</span>
+            {% endif %}
+          </td>
+          <td><strong>{{ log.done_by }}</strong></td>
+          <td style="color:var(--muted);">{{ log.details }}</td>
+          <td style="color:var(--muted); font-size:13px;">{{ log.timestamp }}</td>
+        </tr>
+        {% endfor %}
+
+        {% if not logs %}
+        <tr>
+          <td colspan="4" style="text-align:center; color:var(--muted); padding:40px;">
+            No activity recorded yet.
+          </td>
+        </tr>
+        {% endif %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+{% endblock %}

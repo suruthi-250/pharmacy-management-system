@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+{% block title %}Medicines — PharmaCare{% endblock %}
+{% block page_title %}Medicine Inventory{% endblock %}
+
+{% block content %}
+
+<!-- Header Row -->
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;flex-wrap:wrap;gap:12px">
+  <div>
+    <div style="font-family:var(--ff-mono);font-size:11px;color:var(--txt-3);margin-bottom:4px">
+      {{ medicines|length }} medicine{{ 's' if medicines|length != 1 else '' }} found
+    </div>
+  </div>
+  <a href="{{ url_for('add_medicine') }}" class="btn btn-green">➕ Add Medicine</a>
+</div>
+
+<!-- Filter Bar -->
+<div class="card" style="margin-bottom:20px">
+  <div class="card-body" style="padding:16px 20px">
+    <form method="GET" action="{{ url_for('medicines') }}">
+      <div class="filter-row">
+        <input type="text" name="search" value="{{ search }}" placeholder="🔍  Search by name…" style="flex:1;min-width:200px">
+        <select name="type" style="min-width:160px">
+          <option value="">All Types</option>
+          <option value="Generic"      {% if med_type == 'Generic' %}selected{% endif %}>💊 Generic</option>
+          <option value="Prescription" {% if med_type == 'Prescription' %}selected{% endif %}>📝 Prescription</option>
+          <option value="Herbal"       {% if med_type == 'Herbal' %}selected{% endif %}>🌿 Herbal</option>
+          <option value="Controlled"   {% if med_type == 'Controlled' %}selected{% endif %}>🔒 Controlled</option>
+        </select>
+        <button type="submit" class="btn btn-green">Filter</button>
+        {% if search or med_type %}
+          <a href="{{ url_for('medicines') }}" class="btn btn-outline">Clear</a>
+        {% endif %}
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Table -->
+<div class="card">
+  <div class="table-wrap">
+    {% if medicines %}
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Qty</th>
+          <th>Price</th>
+          <th>Expiry</th>
+          <th>Supplier</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for med in medicines %}
+        {% set today = namespace(s='') %}
+        <tr>
+          <td class="mono" style="color:var(--txt-3)">{{ med.id }}</td>
+          <td style="font-weight:600;color:var(--white)">{{ med.name }}</td>
+          <td>
+            {% if med.type == 'Generic' %}
+              <span class="badge badge-green">💊 Generic</span>
+            {% elif med.type == 'Prescription' %}
+              <span class="badge badge-sky">📝 Rx</span>
+            {% elif med.type == 'Herbal' %}
+              <span class="badge" style="background:rgba(132,204,22,0.12);color:#BEF264;border:1px solid rgba(132,204,22,0.2)">🌿 Herbal</span>
+            {% elif med.type == 'Controlled' %}
+              <span class="badge badge-red">🔒 Controlled</span>
+            {% endif %}
+          </td>
+          <td class="mono">
+            {% if med.quantity <= 10 %}
+              <span style="color:var(--amber);font-weight:600">{{ med.quantity }}</span>
+              <span style="font-size:11px;color:var(--amber)"> ⚠</span>
+            {% else %}
+              {{ med.quantity }}
+            {% endif %}
+          </td>
+          <td class="mono">₹{{ "%.2f"|format(med.price) }}</td>
+          <td class="mono" style="color:var(--txt-2)">{{ med.expiry_date }}</td>
+          <td style="color:var(--txt-2);font-size:13px">{{ med.supplier or '—' }}</td>
+          <td>
+            {# Simple expiry check via string comparison - works since dates are YYYY-MM-DD #}
+            {% set exp = med.expiry_date %}
+            {% if med.quantity == 0 %}
+              <span class="badge badge-slate">Out of Stock</span>
+            {% else %}
+              <span class="badge badge-green">In Stock</span>
+            {% endif %}
+          </td>
+          <td>
+            <div style="display:flex;gap:6px">
+              <a href="{{ url_for('edit_medicine', med_id=med.id) }}" class="btn btn-outline btn-sm">✏️ Edit</a>
+              {% if session.role == 'admin' %}
+              <form method="POST" action="{{ url_for('delete_medicine', med_id=med.id) }}"
+                    onsubmit="return confirm('Delete {{ med.name }}? This cannot be undone.')">
+                <button type="submit" class="btn btn-red btn-sm">🗑</button>
+              </form>
+              {% endif %}
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <div class="empty-state">
+      <div class="empty-state-icon">💊</div>
+      <div class="empty-state-title">No medicines found</div>
+      <div class="empty-state-sub">
+        {% if search or med_type %}
+          Try adjusting your filters
+        {% else %}
+          <a href="{{ url_for('add_medicine') }}" style="color:var(--green)">Add your first medicine</a>
+        {% endif %}
+      </div>
+    </div>
+    {% endif %}
+  </div>
+</div>
+
+{% endblock %}
