@@ -320,7 +320,7 @@ The following screenshots demonstrate the major interfaces of PharmaCare.
 
 ### Generated Bill
 
-![Generated Bill](Screenshots08_generated_bill.png)
+![Generated Bill](Screenshots/08_generated_bill.png)
 
 ---
 
